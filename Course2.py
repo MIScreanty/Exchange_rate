@@ -1,6 +1,7 @@
 import requests
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 currency_dict = {
     "RUB": "Российский рубль",
@@ -174,12 +175,32 @@ def generation_list_rates():
     list_currency = list(json_info["rates"].keys())
     return list_currency
 
-def validate_input(value):
-    try:
-        number = float(value)
-        return number
-    except (ValueError, TypeError):
-        return 1
+def validate_input(P):
+    if P == "" or P.isdigit() or P == ".":
+        return True
+    return False
+
+def on_enter(event):
+    input_value = sum_from.get()
+    if input_value == "":
+        messagebox.showerror("Ошибка", "Поле не должно быть пустым. Установлено значение по умолчанию.")
+        sum_from.delete(0, END)  # Очищаем поле ввода
+        sum_from.insert(0, "1")  # Устанавливаем значение по умолчанию
+    elif not input_value.isdigit():
+        messagebox.showerror("Ошибка", "Пожалуйста, введите только цифры.")
+        sum_from.delete(0, END)  # Очищаем поле ввода
+        sum_from.insert(0, "1")  # Устанавливаем значение по умолчанию
+
+def on_enter_second(event):
+    input_value = sum_from_second.get()
+    if input_value == "":
+        messagebox.showerror("Ошибка", "Поле не должно быть пустым. Установлено значение по умолчанию.")
+        sum_from_second.delete(0, END)  # Очищаем поле ввода
+        sum_from_second.insert(0, "1")  # Устанавливаем значение по умолчанию
+    elif not input_value.isdigit():
+        messagebox.showerror("Ошибка", "Пожалуйста, введите только цифры.")
+        sum_from_second.delete(0, END)  # Очищаем поле ввода
+        sum_from_second.insert(0, "1")  # Устанавливаем значение по умолчанию
 
 #Функция конвертации
 def func_exchange():
@@ -241,6 +262,9 @@ window = Tk()
 window.title("Курс валют")
 window.geometry("400x600")
 
+# Создание валидатора для поля ввода
+validate_cmd = window.register(validate_input)
+
 #Запускаем функцию создания списка из кодов валют - в переменную sp_currency
 sp_currency = generation_list_rates()
 
@@ -257,8 +281,10 @@ combo_from.bind("<<ComboboxSelected>>", update_from_label)
 t_m_from = Label(window, text="Введите сумму базовой валюты 1:")
 t_m_from.pack(pady = [10,10])
 #Ввод суммы для первой базовой валюты для конвертации
-sum_from = Entry(window)
+sum_from = Entry(window, validate="key", validatecommand=(validate_cmd, '%P'))
 sum_from.pack()
+sum_from.insert(0, "1")
+sum_from.bind("<Return>", on_enter)
 
 #Лэйбл для отображения названия выбранной базовой валюты
 curr_from_name = Label(window)
@@ -277,8 +303,10 @@ combo_from_second.bind("<<ComboboxSelected>>", update_from_label_second)
 t_m_from = Label(window, text="Введите сумму базовой валюты 2:")
 t_m_from.pack(pady = [10,10])
 #Ввод суммы для второй базовой валюты для конвертации
-sum_from_second = Entry(window)
+sum_from_second = Entry(window, validate="key", validatecommand=(validate_cmd, '%P'))
 sum_from_second.pack()
+sum_from_second.insert(0, "1")
+sum_from_second.bind("<Return>", on_enter_second)
 
 #Лэйбл для отображения названия выбранной базовой валюты
 curr_from_name_second = Label(window)
